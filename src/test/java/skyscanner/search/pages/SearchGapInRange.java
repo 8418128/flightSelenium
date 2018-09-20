@@ -32,10 +32,9 @@ public class SearchGapInRange implements IDateSearcher{
 
 	public void search() {
 		pc.checkOnlyDirectFlights();
-		Date nextDate = CalendarUtils.getFirstDayOfMonth(p.getDate());
+		Date nextDate = CalendarUtils.getCalendar(p.getDate()).getTime();
 		Date lastDate = CalendarUtils.getCalendar(p.getDateEnd()).getTime();
 		
-		String url = pc.driver.getCurrentUrl();
 		while(nextDate!=null && nextDate.before(lastDate)) {
 			nextDate = pc.processGap(nextDate);
 		}

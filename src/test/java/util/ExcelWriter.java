@@ -41,7 +41,7 @@ public class ExcelWriter {
 			      row.createCell(3).setCellValue(r.getPrice());
 			      row.createCell(4).setCellValue(r.getDatego());
 			      row.createCell(5).setCellValue(r.getHourgo());
-			      row.createCell(7).setCellValue(r.getDateback());
+			      row.createCell(6).setCellValue(r.getDateback());
 			      row.createCell(7).setCellValue(r.getHourback());
 			      row.createCell(8).setCellValue(r.getUrl());
 			    }
@@ -70,7 +70,7 @@ public class ExcelWriter {
 	private static void createHeaders(Row headerRow,CellStyle headerCellStyle) {
 		String[] headers = {"Test Date","Departure airport","Arrival airport","Price","Departure date","Departure time","Arrival date","Arrival time","Url"};
 		
-		for(int i=0;i<=headers.length;i++) {
+		for(int i=0;i<headers.length;i++) {
 			Cell cell6 = headerRow.createCell(i);
 		    cell6.setCellValue(headers[i]);
 		    cell6.setCellStyle(headerCellStyle);

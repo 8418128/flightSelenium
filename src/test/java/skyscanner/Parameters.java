@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import skyscanner.dao.Result;
+import util.CalendarUtils;
 
 public class Parameters {
 	
@@ -18,6 +19,8 @@ public class Parameters {
 	private int maxCountries;
 	private int treshold;
 	
+	private boolean exactDates = false;
+	
 	public final static String reportFile = "C:\\Users\\pepinaco\\Documents\\SeleniumReport\\";
 	
 	private List<String> whiteListCountries;
@@ -28,6 +31,8 @@ public class Parameters {
 	private List<String> flightFrom;
 	private List<Result> results;	
 	
+	private static final String MONTH_FORMAT = "yyyy-MM";
+	private static final String EXACT_DATE_FORMAT = "yy-MM-dd";
 	
 	public Parameters() {
 		initLists();
@@ -40,6 +45,23 @@ public class Parameters {
 		this.blackListCities = new ArrayList<String>();
 		this.flightFrom = new ArrayList<String>();
 		this.results = new ArrayList<Result>();
+	}
+	
+	public String getUrl(String flightFrom) {
+		String url = null;
+		if(exactDates) {
+			String dateGo = getDateFormatForMonthUrl(this.date,EXACT_DATE_FORMAT);
+			String dateBack = getDateFormatForMonthUrl(this.dateEnd,EXACT_DATE_FORMAT);
+			url = "https://www.skyscanner.es/transport/vuelos-desde/"+flightFrom+"/"+dateGo+"/"+dateBack+"/?adults=1&children=0&adultsv2=1&childrenv2=&infants=0&cabinclass=economy&rtn=1&preferdirects=true&outboundaltsenabled=false&inboundaltsenabled=false&ref=home";
+		}else {
+			String date = getDateFormatForMonthUrl(this.date,MONTH_FORMAT);
+			url = "https://www.skyscanner.es/transporte/vuelos-desde/"+flightFrom+"/?adults=1&children=0&adultsv2=1&childrenv2=&infants=0&cabinclass=economy&rtn=1&preferdirects=true&outboundaltsenabled=false&inboundaltsenabled=false&oym="+date+"&iym="+date+"&ref=home";
+		}
+		return url;
+	}
+	
+	private String getDateFormatForMonthUrl(String d,String format) {
+		return CalendarUtils.formatDate(CalendarUtils.getCalendar(d).getTime(), format).replace("-", "");
 	}
 	
 	public boolean checkCityFilter(String city) {
@@ -67,6 +89,16 @@ public class Parameters {
 		this.whiteListCities.add(s);
 	}
 	
+	
+	
+	public boolean isExactDates() {
+		return exactDates;
+	}
+
+	public void setExactDates(boolean exactDates) {
+		this.exactDates = exactDates;
+	}
+
 	public String getReportfile() {
 		return reportFile;
 	}
@@ -182,6 +214,7 @@ public class Parameters {
 	public void setBlackListCities(List<String> blackListCities) {
 		this.blackListCities = blackListCities;
 	}
+	
 	
 	
 	

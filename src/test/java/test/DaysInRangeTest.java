@@ -15,16 +15,16 @@ import skyscanner.search.pages.SearchWeekends;
 import util.ExcelWriter;
 
 public class DaysInRangeTest extends SkyScannerTest{
-	
-	@BeforeTest	
-	public void initSearcher() {
-		
+
+	@Override
+	public Parameters getParameters() {
+		// TODO Auto-generated method stub
 		int maxCities = 5;
 		int maxCountries = 10;
-		int treshold = 50;
-		String date = "2018-10-01";
-		String dateEnd = "2018-11-30";
-		int gap = 7;	
+		int treshold = 70;
+		String date = "2018-11-18";
+		String dateEnd = "2018-12-19";
+		int gap = 4;	
 		
 		Parameters p = new Parameters();
 		p.setMaxCountries(maxCountries);
@@ -35,15 +35,16 @@ public class DaysInRangeTest extends SkyScannerTest{
 		p.setDateEnd(dateEnd);
 		
 		p.addToFlightFrom("svq");
-		p.addToFlightFrom("agp");
+		//p.addToFlightFrom("agp");
 		p.addToBlackListCountries("España");
-		
-		
+		p.addToBlackListCountries("Marruecos");
+		return p;
+	}
+
+	@Override
+	public IDateSearcher getSearcher(Parameters p) {
 		ProcessCalendarDates pc = new ProcessCalendarDates(driver,p);
-		super.p=p;
-		super.sg = new SearchGapInRange(pc,p);
-		
-		
+		return new SearchGapInRange(pc,p);
 	}
 
 	

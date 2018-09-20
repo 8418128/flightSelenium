@@ -9,13 +9,12 @@ import skyscanner.search.pages.SearchWeekends;
 
 public class WeekendTest extends SkyScannerTest{
 	
-	@BeforeTest	
-	public void initSearcher() {
-		
+	@Override
+	public Parameters getParameters() {
 		int maxCities = 5;
 		int maxCountries = 8;
 		int treshold = 150;
-		String date = "2019-01-01";
+		String date = "2018-10-01";
 		String dateEnd = "2019-02-30";
 		int gap = 4;	
 		
@@ -31,15 +30,13 @@ public class WeekendTest extends SkyScannerTest{
 		//p.addToBlackListCountries("España");
 		p.addToWhiteListCities("París");
 		p.addToWhiteListCountries("Francia");
-		
-		
-		
-		
+		return p;
+	}
+
+	@Override
+	public IDateSearcher getSearcher(Parameters p) {
 		ProcessCalendarDates pc = new ProcessCalendarDates(driver,p);
-		super.p=p;
-		super.sg = new SearchWeekends(pc,p);
-		
-		
+		return new SearchWeekends(pc,p);
 	}
 
 	

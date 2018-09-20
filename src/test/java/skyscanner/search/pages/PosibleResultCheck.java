@@ -1,23 +1,30 @@
 package skyscanner.search.pages;
 
+import java.util.Date;
 import java.util.List;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import skyscanner.PageConstants;
+import skyscanner.dao.Result;
 import skyscanner.search.generic.AbstractPage;
+import util.CalendarUtils;
 
 public class PosibleResultCheck extends AbstractPage{
 	
 	private static final String RESULTS_ELEMENT = "#header-list-count > div > span > a";
 	private static final String HOURS_GO = ".LegInfo__leg-depart-3GMlb";
 	private static final String HOURS_BACK = ".LegInfo__leg-arrive-1spXx leg";
-	private static final String CLOSE_ALERT = ".bpk-close-button-3piCr";
+	private static final String CLOSE_ALERT = "#price-alerts-modal button";
+	private static final String PRICES = ".CTASection__price-2bc7h.price";
+	private static final String URLS = ".bpk-button CTASection__cta-button-JozPr";
 	
 	private List<WebElement> hours_depart;
 	private List<WebElement> hours_arrival;
+	private List<WebElement> prices;
 	
-	public PosibleResultCheck(WebDriver driver,int price) {
+	public PosibleResultCheck(WebDriver driver) {
 		super(driver);
 		// TODO Auto-generated constructor stub
 	}
@@ -42,6 +49,20 @@ public class PosibleResultCheck extends AbstractPage{
 		return getArrival(1).split("\\n")[0];
 	}
 	
+	public int getPrice(int i) {
+		try {
+			return getIntegers(prices.get(i).getText());
+		}catch(Exception e) {
+			System.out.println("Error getting price");
+			return -1;
+		}
+		
+	}
+	
+	public String getUrl() {
+		return driver.getCurrentUrl();
+	}
+	
 	
 	@Override
 	public boolean isReady() {
@@ -54,10 +75,26 @@ public class PosibleResultCheck extends AbstractPage{
 			}
 			hours_depart = this.findDynamicElementsByCss(HOURS_GO);
 			hours_arrival = this.findDynamicElementsByCss(HOURS_GO);
+			prices = this.findDynamicElementsByCss(PRICES);
 		}catch(Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		return true;		
+	}
+	
+	public Result getResult(Date go,Date back) {
+		String[] fromto = this.findDynamicElementByCss(PageConstants.FROM_TO).getText().split("-");
+		String cityFrom = fromto[0].split("\\n")[0].trim();
+		String cityGo = fromto[1].trim();
+		String format = "dd/MM/yyyy";
+		String datego = CalendarUtils.formatDate(go, format);
+		String dateback = CalendarUtils.formatDate(back, format);
+		Result r = new Result(cityFrom, cityGo, getPrice(0)+"", datego, dateback, getUrl());
+		r.setHourgo(getFromDepart());
+		r.setHourback(getToDepart());
+		return r;
+		
 	}
 	
 	

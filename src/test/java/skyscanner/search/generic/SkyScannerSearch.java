@@ -17,10 +17,12 @@ import util.ExcelWriter;
 
 public class SkyScannerSearch extends AbstractPage{
 	
-	protected static String COUNTRY_LIST = ".browse-list-category";
-	protected String COUNTRY_LIST_R = "li.browse-list-category:nth-child("+REPLACE_TAG1+") > a:nth-child(1)";	
-	protected static String LINK = "li.browse-list-category:nth-child("+REPLACE_TAG1+") > ul:nth-child(2) > li:nth-child("+REPLACE_TAG2+") > a:nth-child(1)";	
-	protected static String ONLY_DIRECT = "#filter-direct-stops-input";
+	protected final static String COUNTRY_LIST = ".browse-list-category";
+	protected final static String COUNTRY_LIST_R = "li.browse-list-category:nth-child("+REPLACE_TAG1+") > a:nth-child(1)";	
+	protected final static String LINK = "li.browse-list-category:nth-child("+REPLACE_TAG1+") > ul:nth-child(2) > li:nth-child("+REPLACE_TAG2+") > a:nth-child(1)";	
+	protected final static String ONLY_DIRECT = "#filter-direct-stops-input";
+	//article/div[contains(@class,'one-fourth-percent')]
+	protected final static String CITIES = "//[contains(@class,'browse-list-category open')]//li[contains(@class,'browse-list-result with-image']";
 	private Parameters p;
 	protected IDateSearcher ri;
 	public SkyScannerSearch(WebDriver driver ,IDateSearcher ri,Parameters p) {
@@ -88,7 +90,7 @@ public class SkyScannerSearch extends AbstractPage{
 						resultCount++;
 					}
 				}catch(Exception e) {
-					
+					System.out.println("error clicking country");
 				}
 				
 				countryIndex++;	
@@ -112,7 +114,9 @@ public class SkyScannerSearch extends AbstractPage{
 	public List<String> getCitiesList(int countrIndex) {
 		List<String> result = new ArrayList<String>();
 		int cityIndex = 1;
-		while(cityIndex<=p.getMaxCities()) {
+		//List<WebElement> cities = this.findElementsByXPath(CITIES);
+		//cities.size();
+		while(cityIndex<=p.getMaxCities() ) {
 			try {
 				String norm1 = normalizeIndex(REPLACE_TAG1, LINK, countrIndex);
 				String norm2 = normalizeIndex(REPLACE_TAG2, norm1, cityIndex);

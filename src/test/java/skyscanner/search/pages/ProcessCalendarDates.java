@@ -22,12 +22,15 @@ public class ProcessCalendarDates extends AbstractPage{
 	protected static final String ONLY_DIRECT = ".bpk-checkbox__input-270PP";
 	protected static final String NEXT_MONTH = "html.bpk-no-touch-support body div#pagewrap div#app-root div.App-TPVhj div.App__contentWrapper-2s3zB div div.month-view div div.month-view__card div.month-view__tabbed-panels div div div.clearfix.month-view__calendar-area div div.month-view-calendar.inbound-calendar div.bpk-calendar-2LUwd div.month-selector.clearfix div.month-selector__nav-wrapper div.bpk-calendar-nav-2l_9b div.bpk-calendar-nav__nudger-1VP-5 button#inbound__bpk_calendar_nav_month_nudger_next.bpk-calendar-nav__button-3Bcsr";
 	protected static final String PRICE = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__trip-summary > div.month-view__trip-summary-selection--with-price > div > div.month-view__trip-summary-price-display";
-	protected static final String DAY_GO = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__tabbed-panels > div:nth-child(2) > div > div > div > div.month-view-calendar.outbound-calendar > div > div.month-view-grid-wrapper > table > tbody > tr:nth-child("+REPLACE_TAG1+") > td:nth-child("+REPLACE_TAG2+") > button > div.date";
-	protected static final String DAY_BACK = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__tabbed-panels > div:nth-child(2) > div > div > div > div.month-view-calendar.inbound-calendar > div > div.month-view-grid-wrapper > table > tbody > tr:nth-child("+REPLACE_TAG1+") > td:nth-child("+REPLACE_TAG2+") > button > div.date";
+	protected static final String DAY_GO = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__tabbed-panels > div:nth-child(2) > div > div > div > div.month-view-calendar.outbound-calendar > div > div.month-view-grid-wrapper > table > tbody > tr:nth-child("+REPLACE_TAG1+") > td:nth-child("+REPLACE_TAG2+") > button";
+	protected static final String DAY_BACK = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__tabbed-panels > div:nth-child(2) > div > div > div > div.month-view-calendar.inbound-calendar > div > div.month-view-grid-wrapper > table > tbody > tr:nth-child("+REPLACE_TAG1+") > td:nth-child("+REPLACE_TAG2+") > button";
 	protected static final String SEE_FLIGHT = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__trip-summary > div.month-view__trip-summary-selection--with-price > a > span:nth-child(1)";
 	protected static final String COMPARE_PRICES = "a.bpk-button-zZ0K5 > span:nth-child(1)";
 	protected static final String COMPARE_PRICES_A = "a.bpk-button-zZ0K5";
 	protected static final String FROM_TO = "#js-search-summary-bar > div > div > h2";
+	
+	protected static final String PRICE_CHECK = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__tabbed-panels > div:nth-child(2) > div > div > div > div.month-view-calendar.outbound-calendar > div > div.month-view-grid-wrapper > table > tbody > tr:nth-child("+REPLACE_TAG1+") > td:nth-child("+REPLACE_TAG1+") > button > div.price";
+	protected static final String PRICE_CHECK2 = "#app-root > div > div > div:nth-child(2) > div > div:nth-child(2) > div.month-view__card > div.month-view__tabbed-panels > div:nth-child(2) > div > div > div > div.month-view-calendar.inbound-calendar > div > div.month-view-grid-wrapper > table > tbody > tr:nth-child("+REPLACE_TAG1+") > td:nth-child("+REPLACE_TAG1+") > button > div.price";
 	Parameters p;
 	
 	public ProcessCalendarDates(WebDriver driver,Parameters p) {
@@ -54,33 +57,19 @@ public class ProcessCalendarDates extends AbstractPage{
 		
 		checkDateInCalendar(from, true,0);
 		checkDateInCalendar(to, false,0);
-		if(selectDatesAndCheck(go, back, treshold)) {
-			Result r = getResult(from,to);
-			PosibleResultCheck prc = new PosibleResultCheck(driver, 1);
+		boolean check = selectDatesAndCheck(go, back, treshold);
+		if(check) {
+			PosibleResultCheck prc = new PosibleResultCheck(driver);
 			String backUrl = driver.getCurrentUrl();
-			driver.get(r.getUrl());
-			if(prc.isReady()) {
-				try {
-					r.setHourback(prc.getToDepart());
-					r.setHourgo(prc.getFromDepart());
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-				p.addResult(r);
+			String url = this.findDynamicElementByCss(COMPARE_PRICES_A).getAttribute("href");
+			driver.get(url);
+			if(prc.isReady()) {	
+				p.addResult(prc.getResult(from, to));
 			}
 			driver.get(backUrl);
 		}
 	}
 	
-	public Result getResult(Date from,Date to) {
-		String price = getIntegers(this.findDynamicElementByCss(PRICE).getText()).toString();
-		String url = this.findDynamicElementByCss(COMPARE_PRICES_A).getAttribute("href");
-		String[] fromto = this.findDynamicElementByCss(FROM_TO).getText().split("-");
-		String cityFrom = fromto[0].split("\\n")[0].trim();
-		String cityGo = fromto[1].trim();
-		String format = "dd/MM/yyyy";
-		return new Result(cityFrom,cityGo, price, CalendarUtils.formatDate(from, format), CalendarUtils.formatDate(to, format), url);
-	}
 	
 	protected void checkDateInCalendar(Date date,boolean from,int times) {
 		String selector = from?MONTH_FROM:MONTH_TO;
@@ -114,7 +103,7 @@ public class ProcessCalendarDates extends AbstractPage{
 			cb.click();
 		}
 	}
-	
+
 
 	@Override
 	public boolean isReady() {
@@ -124,13 +113,15 @@ public class ProcessCalendarDates extends AbstractPage{
 	
 	public boolean selectDatesAndCheck(int[] go,int[] back,int treshold) {
 		try {
-			select(go,DAY_GO);
-			select(back,DAY_BACK);			
-			try {
-				return checkPriceForTreshold(treshold);
-			}catch(ElementClickInterceptedException e) {
-				acceptCookies();
-				return  checkPriceForTreshold(treshold);
+			boolean sel1 = select(go,true);
+			boolean sel2 = select(back,false);
+			if(sel1 && sel2) {
+				try {
+					return checkPriceForTreshold(treshold);
+				}catch(ElementClickInterceptedException e) {
+					acceptCookies();
+					return  checkPriceForTreshold(treshold);
+				}
 			}
 		}catch(Exception e) {
 			
@@ -148,11 +139,16 @@ public class ProcessCalendarDates extends AbstractPage{
 		return false;
 	}
 	
-	public void select(int[] indexes,String selector) {
-		String aux = selector;
+	public boolean select(int[] indexes,boolean depart) {
+		String aux = depart?DAY_GO:DAY_BACK;
 		aux = normalizeIndex(REPLACE_TAG1, aux, indexes[0]);		
 		aux = normalizeIndex(REPLACE_TAG2, aux, indexes[1]);
-		this.findDynamicElementByCss(aux,5).click();
+		WebElement button = this.findDynamicElementByCss(aux,5);
+		if(button.getAttribute("class").contains("--blocked")) {
+			return false;
+		}
+		button.click();
+		return true;
 	}
 		
 }

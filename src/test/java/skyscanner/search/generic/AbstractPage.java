@@ -81,6 +81,10 @@ public abstract class AbstractPage {
 		return findDynamicElement(By.cssSelector(css),time);
 	}
 	
+	public WebElement findDynamicElementByXpath ( String css,int time ) {
+		return findDynamicElement(By.xpath(css),time);
+	}
+	
 	public List<WebElement> findDynamicElementsByCss ( String css ) {
 		return driver.findElements(By.cssSelector(css));
 	}
@@ -90,6 +94,12 @@ public abstract class AbstractPage {
 		WebDriverWait wait = new WebDriverWait ( driver , timeOut );
 		WebElement element = wait.until ( ExpectedConditions.visibilityOfElementLocated ( by ) );
 		return element;
+	}
+	
+	
+	
+	public WebElement findDynamicElement ( WebElement we ,String css) {
+		return we.findElement(By.cssSelector(css));
 	}
 	
 	public String normalizeIndex ( String replacement, String selector , int index ) {
@@ -120,10 +130,5 @@ public abstract class AbstractPage {
 	
 	public abstract boolean isReady ();
 	
-	public void openTab() {
-		driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL +"t");
-	}
-	public void closeTab() {
-		driver.findElement(By.cssSelector("body")).sendKeys(Keys.CONTROL +"w");
-	}
+	
 }
